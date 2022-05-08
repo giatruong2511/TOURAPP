@@ -32,14 +32,13 @@ class CustomerType(ModelBase):
 
 class TourPrice(ModelBase):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='tourprice')
-    customertype = models.ForeignKey(CustomerType, on_delete=models.CASCADE)
-    price = models.FloatField(null=False)
+    customertype = models.ForeignKey(CustomerType, on_delete=models.CASCADE, related_name='customer')
+    price = models.IntegerField(null=False)
     class Meta:
         unique_together = ('tour', 'customertype')
 
-
     def __str__(self):
-        return (self.tour , self.customertype)
+        return self.tour.name + " " + self.customertype.name
 
 class BookingTour(ModelBase):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='bookingtour', related_query_name='my_bookingtour')
@@ -48,8 +47,11 @@ class BookingTour(ModelBase):
     childticketnumber = models.IntegerField(default = 0, null=False)
     adultticketnumber = models.IntegerField(default=1, null=False)
 
+    def __str__(self):
+        return self.tour.name + " " + str(self.user)
+
 class Payment(ModelBase):
-    bookingtour = models.ForeignKey(BookingTour,null=True, on_delete=models.SET_NULL)
+    bookingtour = models.ForeignKey(BookingTour, null=True, on_delete=models.SET_NULL)
     totalmoney = models.FloatField()
 
 class Tag(ModelBase):
@@ -81,7 +83,8 @@ class TourRating(ModelBase):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='ratings')
     rating = models.PositiveSmallIntegerField(null=False)
 
-
+    def __str__(self):
+        return self.tour.name + " " + str(self.rating)
 
 class Category(ModelBase):
     name = models.CharField(max_length=255, null=False)

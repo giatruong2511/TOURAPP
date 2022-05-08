@@ -141,9 +141,13 @@ DATABASES = {
     }
 }
 
+OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+}
 AUTH_USER_MODEL = 'tours.User'
 MEDIA_ROOT = '%s/tours/static/' % BASE_DIR
 CKEDITOR_UPLOAD_PATH = "images/news/"
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
