@@ -156,3 +156,8 @@ REST_FRAMEWORK = {
 INTERNAL_IPS = [
     '127.0.0.1'
 ]
+
+OAUTH2_INFO = {
+    "client_id": "Oc1krexXQRrf3LFRraEIhAlr1WrSyQl6QvfJdx4I",
+    "client_secret": "FO7uQpLz83QPPXSTew5vGhkMCtt8znhVNkCaYWJYjWqGhD0FP8kisZfqV5mvQHYFpxRoI1jkQ81aHB7G4YzbDPv8YJ57l96wZCTeluvOCfNoDThpCs9h7OtBXps5kJPK",
+}

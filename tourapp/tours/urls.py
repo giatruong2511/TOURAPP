@@ -13,5 +13,6 @@ routers.register(prefix='newscomments', viewset=views.TourCommentViewSet, basena
 routers.register(prefix='bookings', viewset=views.BookingTourViewSet, basename='booking')
 
 urlpatterns = [
-    path('', include(routers.urls))
+    path('', include(routers.urls)),
+    path('oauth2-info/', views.AuthInfo.as_view())
 ]
