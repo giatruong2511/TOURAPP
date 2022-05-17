@@ -6,18 +6,53 @@ from .models import TourComment, TourRating, User, Tour, NewsComment, NewsAction
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_path = serializers.SerializerMethodField(source='avatar')
+    def get_avatar_path(self, obj):
+        request = self.context['request']
+        if obj.avatar and not obj.avatar.name.startswith("/static"):
+
+            path = '/static/%s' % obj.avatar.name
+
+            return request.build_absolute_uri(path)
+
     class Meta:
         model = User
-        fields =['username', 'password', 'email', 'first_name', 'last_name', 'avatar']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'first_name', 'last_name',
+                  'username', 'password', 'email',
+                  'avatar', 'avatar_path']
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }, 'avatar_path': {
+                'read_only': True
+            }, 'avatar': {
+                'write_only': True
+            }
+        }
 
     def create(self, validated_data):
         data = validated_data.copy()
-        user =User(**data)
+        user = User(**data)
         user.set_password(user.password)
         user.save()
 
         return user
+
+
+class UserViewSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField(source='avatar')
+
+    def get_avatar(self, obj):
+        request = self.context['request']
+        if obj.avatar and not obj.avatar.name.startswith("/static"):
+            path = '/static/%s' % obj.avatar.name
+
+            return request.build_absolute_uri(path)
+
+    class Meta:
+        model = User
+        fields =['id','username', 'password', 'email', 'first_name', 'last_name', 'avatar']
+
 
 class CustomerTypeSerializer(serializers.ModelSerializer):
 
@@ -43,7 +78,6 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ['link']
 
 class TourSerializer(serializers.ModelSerializer):
-
      tourprice = TourPriceSerializer(many=True)
      images = ImageSerializer(many=True)
      class Meta:
@@ -55,7 +89,7 @@ class TourDetailSerializer(TourSerializer):
         fields = TourSerializer.Meta.fields + ['content']
 
 class BookingTourSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserViewSerializer()
     tour = TourSerializer()
     class Meta:
         model = BookingTour
@@ -98,7 +132,7 @@ class NewsSerializer(serializers.ModelSerializer):
 
 
 class NewsCommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserViewSerializer()
     class Meta:
         model = NewsComment
         exclude = ['active']

@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='users/%Y/%m/',
-                              null=True, blank=True)
+    avatar = models.ImageField(null=True, upload_to='users/%Y/%m')
 
 class ModelBase(models.Model):
     active = models.BooleanField(default=True)
