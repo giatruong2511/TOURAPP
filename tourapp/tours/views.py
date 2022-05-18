@@ -92,7 +92,7 @@ class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
     def get_comments(self, request, pk):
         tour = self.get_object()
         comments = tour.tourcomments.select_related('user').filter(active=True)
-        return Response(TourCommentSerializer(comments, many=True).data,
+        return Response(TourCommentSerializer(comments , context={'request': request}, many=True).data,
                         status=status.HTTP_200_OK)
 
     @action(methods=['post'], url_path='rating', detail=True)
@@ -185,7 +185,7 @@ class NewsDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
     def get_comments(self, request, pk):
         new = self.get_object()
         comments = new.newscomments.select_related('user').filter(active=True)
-        return Response(NewsCommentSerializer(comments, many=True).data,
+        return Response(NewsCommentSerializer(comments, context={'request': request}, many=True).data,
                         status=status.HTTP_200_OK)
 
     @action(methods=['post'], url_path='like', detail=True)

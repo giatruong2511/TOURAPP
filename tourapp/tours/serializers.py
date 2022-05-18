@@ -41,10 +41,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserViewSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField(source='avatar')
-
     def get_avatar(self, obj):
         request = self.context['request']
         if obj.avatar and not obj.avatar.name.startswith("/static"):
+
             path = '/static/%s' % obj.avatar.name
 
             return request.build_absolute_uri(path)
@@ -100,7 +100,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = [ 'totalmoney','bookingtour']
 
 class TourCommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserViewSerializer()
 
     class Meta:
         model = TourComment
