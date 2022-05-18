@@ -80,8 +80,9 @@ class TourComment(ModelBase):
 class TourRating(ModelBase):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='ratings')
-    rating = models.PositiveSmallIntegerField(null=False)
-
+    rating = models.SmallIntegerField(null=False)
+    class Meta:
+        unique_together = ('user', 'tour')
     def __str__(self):
         return self.tour.name + " " + str(self.rating)
 
@@ -108,13 +109,8 @@ class NewsComment(ModelBase):
         return self.content
 
 class NewsAction(ModelBase):
-    news = models.ForeignKey(News, on_delete=models.CASCADE)
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    LIKE, HAHA, HEART, SAD = range(4)
-    ACTIONS = [
-        (LIKE, 'like'),
-        (HAHA, 'haha'),
-        (HEART, 'heart'),
-        (SAD, 'sad')
-    ]
-    type = models.PositiveSmallIntegerField(choices=ACTIONS, default=LIKE)
+    like = models.BooleanField(default=False)
+    class Meta:
+        unique_together = ('user', 'news')

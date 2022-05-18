@@ -128,8 +128,11 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ['id', 'subject','content', 'image', 'category']
-
+        fields = ['id', 'subject', 'image', 'category']
+class NewsDetailSerializer(NewsSerializer):
+    class Meta:
+        model = News
+        fields = NewsSerializer.Meta.fields + ['content']
 
 class NewsCommentSerializer(serializers.ModelSerializer):
     user = UserViewSerializer()
@@ -150,9 +153,9 @@ class AuthTourDetailSerializer(TourDetailSerializer):
     def get_rating(self, tour):
         request = self.context.get('request')
         if request:
-            r = tour.rating_set.filter(user=request.user).first()
+            r = tour.ratings.filter(user=request.user).first()
             if r:
-                return r.rate
+                return r.rating
 
     class Meta:
         model = Tour
@@ -160,18 +163,18 @@ class AuthTourDetailSerializer(TourDetailSerializer):
 
 
 
-class AuthNewsDetailSerializer(NewsSerializer):
+class AuthNewsDetailSerializer(NewsDetailSerializer):
     like = serializers.SerializerMethodField()
 
     def get_like(self, news):
         request = self.context.get('request')
         if request:
-            return news.like_set.filter(user=request.user, active=True).exists()
+            return news.likes.filter(user=request.user, active=True).exists()
 
 
     class Meta:
         model = News
-        fields = NewsSerializer.Meta.fields + ['like']
+        fields = NewsDetailSerializer.Meta.fields + ['like']
 
 
 

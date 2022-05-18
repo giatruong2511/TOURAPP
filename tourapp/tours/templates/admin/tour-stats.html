@@ -55,6 +55,7 @@ body {
 </style>
 <div class="color" >
   <h4 class="text-center">THỐNG KÊ & BÁO CÁO</h4>
+    <h5> {{dau}}</h5>
   <div class="row" >
       <div class="col-xl-3 col-md-6">
         <div class="card card-stats " >
@@ -117,6 +118,7 @@ body {
       <input type="submit" value="Thống kê" class="btn btn-success" />
   </form>
 </div>
+<h6><3----Số lượt Tour tháng này được đặt----<3</h6>
 <ul>
     {% for c in tour_stats %}
     <li><strong>{{ c.name }}</strong> có {{ c.tourbook_count }} lượt đặt </li>
@@ -136,51 +138,83 @@ body {
     let colorss = []
     let borderColorss = []
     let rs, gs, bs
+    {% for s in totaltour %}
+        {% if s == None %}
+            datas.push(0)
+        {% else %}
+            datas.push({{ s }})
+        {% endif %}
+        rs = parseInt(Math.random() * 255)
+        bs = parseInt(Math.random() * 255)
+        gs = parseInt(Math.random() * 255)
+        colorss.push(`rgba(${rs}, ${gs}, ${bs}, 0.8)`)
+        borderColorss.push(`rgba(${rs}, ${gs}, ${bs}, 1)`)
+    {% endfor%}
+    let datass = []
+    {% for s in totalbooking %}
+        {% if s == None %}
+            datass.push(0)
+        {% else %}
+            datass.push({{ s }})
+        {% endif %}
+    {% endfor%}
+<!--    {% for c in totaltour %}-->
+<!--    labelss.push('{{ c.name }}')-->
+<!--    datas.push({{ c.tourbook_count }})-->
+<!--    rs = parseInt(Math.random() * 255)-->
+<!--    gs = parseInt(Math.random() * 255)-->
+<!--    bs = parseInt(Math.random() * 255)-->
+<!--    colorss.push(`rgba(${rs}, ${gs}, ${bs}, 0.8)`)-->
+<!--    borderColorss.push(`rgba(${rs}, ${gs}, ${bs}, 1)`)-->
+<!--    {% endfor %}-->
 
-    {% for c in tour_stats %}
-    labelss.push('{{ c.name }}')
-    datas.push({{ c.tourbook_count }})
-    rs = parseInt(Math.random() * 255)
-    gs = parseInt(Math.random() * 255)
-    bs = parseInt(Math.random() * 255)
-    colorss.push(`rgba(${rs}, ${gs}, ${bs}, 0.8)`)
-    borderColorss.push(`rgba(${rs}, ${gs}, ${bs}, 1)`)
-    {% endfor %}
-
+    type = ""
     let labels = []
     let data = []
     let colors = []
     let borderColors = []
     let r, g, b
-
     {% for c in a %}
     labels.push({{ c }})
-    r = parseInt(Math.random() * 255)
-    g = parseInt(Math.random() * 255)
-    b = parseInt(Math.random() * 255)
-    colors.push(`rgba(${r}, ${g}, ${b}, 0.8)`)
-    borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`)
+
     {% endfor %}
     {% for s in total %}
-        {% if s.totalmoney__sum == None%}
+        {% if s.totalmoney__sum == None %}
             data.push(0)
         {% else %}
             data.push({{ s.totalmoney__sum }})
         {% endif %}
+        r = parseInt(Math.random() * 255)
+    g = parseInt(Math.random() * 255)
+    b = parseInt(Math.random() * 255)
+    colors.push(`rgba(${r}, ${g}, ${b}, 0.8)`)
+    borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`)
     {% endfor%}
 
     window.onload = function() {
         const ctxs = document.getElementById('mysChart').getContext('2d')
 
         const mysChart = new Chart(ctxs, {
-            type: 'bar',
+            {%if cars != 'nam'%}
+                type: 'bar',
+            {% endif %}
+            {%if cars == 'nam'%}
+                type: 'line',
+            {% endif %}
             data: {
-                labels: labelss,
+                labels: labels,
                 datasets: [{
-                    label: 'Thong ke so dat tour',
+                    label: 'Thong ke so Tour',
                     data: datas,
                     backgroundColor: colorss,
                     borderColor: borderColorss,
+                    borderWidth: 1
+                },
+                {
+                    label: 'Thong ke so luot dat Tour',
+                    data: datass,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
                     borderWidth: 1
                 }]
             },
@@ -195,7 +229,12 @@ body {
         const ctx = document.getElementById('myChart').getContext('2d')
 
         const myChart = new Chart(ctx, {
-            type: 'line',
+            {%if cars != 'nam'%}
+                type: 'line',
+            {% endif %}
+            {%if cars == 'nam'%}
+                type: 'bar',
+            {% endif %}
             data: {
                 labels: labels,
                 datasets: [{

@@ -11,7 +11,7 @@ from .models import User, TourComment, Tour, TourRating, News, NewsComment, News
 from .serializers import (UserSerializer, CreateTourCommentSerializer, TourSerializer,
                           TourCommentSerializer, AuthTourDetailSerializer, NewsSerializer, NewsCommentSerializer,
                           CreateNewsCommentSerializer, AuthNewsDetailSerializer,
-                          BookingTourSerializer, PaymentSerializer, TourDetailSerializer,
+                          BookingTourSerializer, PaymentSerializer, TourDetailSerializer, NewsDetailSerializer
                           )
 from .paginators import TourPaginator
 from .perms import CommentOwnerPermisson, BookingOwnerPermisson
@@ -33,6 +33,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
                         status=status.HTTP_200_OK)
 
 class AuthInfo(APIView):
+
     def get(self, request):
         return Response(settings.OAUTH2_INFO, status=status.HTTP_200_OK)
 
@@ -40,25 +41,21 @@ class AuthInfo(APIView):
 class TourViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Tour.objects.filter(active=True)
     serializer_class = TourSerializer
-
-class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
-    queryset = Tour.objects.filter(active=True)
-    serializer_class = TourDetailSerializer
-    pagination_class = TourPaginator
     def get_queryset(self):
         tour = self.queryset
 
-        q = self.request.query_params.get('q')
+        q = self.request.query_params.get('kw')
         if q:
             tour = tour.filter(name__icontains = q)
 
         endpos = self.request.query_params.get('endpos')
         if endpos:
             tour = tour.filter(endPOS__icontains = endpos)
-        # price = int(self.request.query_params.get('price'))
-        # if price:
-        #
         return tour
+class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
+    queryset = Tour.objects.filter(active=True)
+    serializer_class = TourDetailSerializer
+
     def get_serializer_class(self):
         if self.request.user.is_authenticated:
             return AuthTourDetailSerializer
@@ -104,7 +101,7 @@ class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
         user = request.user
 
         r, _ = TourRating.objects.get_or_create(tour=tour, user=user)
-        r.rate = request.data.get('rate', 0)
+        r.rating = request.data.get('rating', 0)
         try:
             r.save()
         except:
@@ -148,10 +145,10 @@ class TourCommentViewSet(viewsets.ViewSet,generics.CreateAPIView, generics.Updat
 
         return [permissions.IsAuthenticated()]
 
-
-class NewsViewSet(viewsets.ViewSet,generics.ListAPIView, generics.RetrieveAPIView):
-    queryset = News.objects.filter(active = True)
+class NewsViewSet(viewsets.ViewSet,generics.ListAPIView):
+    queryset = News.objects.filter(active=True)
     serializer_class = NewsSerializer
+
     def get_queryset(self):
         news = News.objects.filter(active=True)
 
@@ -159,11 +156,15 @@ class NewsViewSet(viewsets.ViewSet,generics.ListAPIView, generics.RetrieveAPIVie
         if new is not None:
             news = News.objects.filter(subjects__icontains=new)
         return news
+class NewsDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
+    queryset = News.objects.filter(active = True)
+    serializer_class = NewsDetailSerializer
+
     def get_serializer_class(self):
         if self.request.user.is_authenticated:
             return AuthNewsDetailSerializer
 
-        return NewsSerializer
+        return NewsDetailSerializer
 
     def get_permissions(self):
         if self.action in ['add_comment', 'like']:
