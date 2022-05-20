@@ -16,6 +16,7 @@ from .serializers import (UserSerializer, CreateTourCommentSerializer, TourSeria
 from .paginators import TourPaginator
 from .perms import CommentOwnerPermisson, BookingOwnerPermisson
 from django.conf import settings
+from django.core.mail import send_mail
 
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
     queryset = User.objects.filter(is_active=True)
@@ -72,11 +73,16 @@ class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
         adultticketnumber = request.data.get('adultticketnumber')
         if adultticketnumber != 0:
             c = BookingTour.objects.create(childticketnumber=childticketnumber,
-                                           adultticketnumber = adultticketnumber,
+                                           adultticketnumber=adultticketnumber,
                                            tour=self.get_object(),
                                            user=request.user)
-            return Response(BookingTourSerializer(c).data, status=status.HTTP_201_CREATED)
+            return Response(BookingTourSerializer(c, context={"request": request}).data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], url_path='idbooking', detail=False)
+    def idBooking(self, request):
+        c = BookingTour.objects.all().last()
+        return Response(BookingTourSerializer(c, context={"request": request}).data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], url_path='add-comment', detail=True)
     def add_comment(self, request, pk):
@@ -113,10 +119,16 @@ class TourDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
 
 
 class BookingTourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
+
     queryset = BookingTour.objects.filter(active=True)
     serializer_class = BookingTourSerializer
     ermission_classes = [permissions.IsAuthenticated]
 
+    # def get_queryset(self, request):
+    #     users = request.user
+    #     booking = self.queryset
+    #     booking = booking.filter(user.id == users.id)
+    #     return booking
     def get_permissions(self):
         if self.action in ['payment']:
             return [permissions.IsAuthenticated()]
@@ -130,6 +142,12 @@ class BookingTourViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Retrie
         if tatalmoney:
             c = Payment.objects.create(totalmoney=tatalmoney,
                                         bookingtour=self.get_object())
+            # send_mail(
+            #     "Detail payment",
+            #     tatalmoney,
+            #     "1951050100truong@ou.edu.vn",
+            #     ['giatruong251101@gmail.com']
+            # )
             return Response(PaymentSerializer(c).data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

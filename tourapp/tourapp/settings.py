@@ -141,9 +141,9 @@ DATABASES = {
     }
 }
 
-OAUTH2_PROVIDER = {
-    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-}
+# OAUTH2_PROVIDER = {
+#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+# }
 AUTH_USER_MODEL = 'tours.User'
 MEDIA_ROOT = '%s/tours/static/' % BASE_DIR
 CKEDITOR_UPLOAD_PATH = "images/news/"
@@ -161,3 +161,12 @@ OAUTH2_INFO = {
     "client_id": "Oc1krexXQRrf3LFRraEIhAlr1WrSyQl6QvfJdx4I",
     "client_secret": "FO7uQpLz83QPPXSTew5vGhkMCtt8znhVNkCaYWJYjWqGhD0FP8kisZfqV5mvQHYFpxRoI1jkQ81aHB7G4YzbDPv8YJ57l96wZCTeluvOCfNoDThpCs9h7OtBXps5kJPK",
 }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = '1951050100truong@ou.edu.vn'
+EMAIL_HOST_PASSWORD = 'Nvt251101'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
